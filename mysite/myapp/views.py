@@ -57,7 +57,10 @@ def createItem(request):
 class ItemCreateView(CreateView):
     model = Item
     fields = ['item_name', 'item_description', 'item_price', 'item_image']
-
+    def form_valid(self, form):
+        form.instance.user_name = self.request.user 
+        return super().form_valid(form)
+        
 def update_item(request, id):
     item = Item.objects.get(id =id)
     
