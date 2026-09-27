@@ -1,0 +1,31 @@
+{% extends 'myapp/base.html' %}
+    <h1>This is just a template.</h1>
+
+
+{% block body %}
+    <div>
+        {% for item in item_list %}
+
+            <div class="m-10 flex w-1/2 mx-auto">
+                <div>
+                    <img src="{{ item.item_image }}" alt="" >
+                </div>
+
+                <div class="mx-16">
+                    <h1 class="font-bold">Item Name: {{ item.item_name }}</h1>
+                    <p>Description: {{ item.item_description }} </p>
+                    <h2 class="text-green-700 font-bold">Price: ${{ item.item_price }}</h2>
+                </div>
+
+                <div>
+                    <a href="{% url 'myapp:item_detail' item.id %}" class="inline-block bg-red-500 text-white font-bold px-4 py-2">View Details</a>
+                </div>
+
+            </div>
+
+        {% endfor %}
+    </div>
+    
+{% endblock %}
+    
+
