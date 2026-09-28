@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
+from .managers import ItemManager
+from django.utils import timezone
 # Create your models here.
 class Item(models.Model):
     class Meta:
@@ -14,6 +16,11 @@ class Item(models.Model):
     item_image = models.URLField(max_length=1000, default="https://placeholder.com")
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False) #soft delete field
+    deleted_at = models.DateTimeField(null=True, blank=True) #saves timestamp when it is deleted
+    
+    objects = ItemManager()
+    # all_objects = models.Manager()
     
     def __str__(self):
         return self.item_name
@@ -21,6 +28,10 @@ class Item(models.Model):
     def get_absolute_url(self):
         return reverse("myapp:index")
     
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save()
 class Category(models.Model):
     name = models.CharField(max_length=100)
     added_on = models.DateField(auto_now=True)

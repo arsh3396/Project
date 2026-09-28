@@ -95,3 +95,14 @@ def delete_item(request, id):
 class ItemDelete(DeleteView):
     model = Item
     success_url = reverse_lazy("myapp:index")
+    
+def get_objects(request):
+    for item in Item.objects.all():
+        print(item.item_name)
+           
+def get_objects_optimized(request):
+    items = Item.objects.only('item_name')
+    for item in items:
+        print(item.item_name)
+        
+        
