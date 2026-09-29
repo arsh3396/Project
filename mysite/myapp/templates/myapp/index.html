@@ -1,8 +1,8 @@
 {% extends 'myapp/base.html' %}
+{% load custom_filters %}
     <h1>This is just a template.</h1>
 
 {% load cache %}
-
 {% block body %}
     <div>
         
@@ -16,9 +16,11 @@
                 <div class="mx-16">
 
                     <h1 class="font-bold">Item Name: {{ item.item_name|upper}}</h1>
-                    <p>Description: {{ item.item_description }} </p>
+                    <p>Description: {{ item.item_description|lower|truncatechars:20 }} </p>
                     <div> {{ item.user_name }}</div>
-                    <h2 class="text-green-700 font-bold">Price: ${{ item.item_price }}</h2>
+                    <div> {{ item.created_at|date:"d-M-Y"}}</div>
+                    <h2 class="text-green-700 font-bold">Price: {{ item.item_price|currency}}</h2>
+                    <div>Discounted price: {{ item.item_price|discount:10|currency }}</div>
                 </div>
 
                 <div>
