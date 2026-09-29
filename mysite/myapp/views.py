@@ -7,21 +7,39 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.core.paginator import Paginator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 # Create your views here.
 
-# @login_required
-# def index(request):
-#     item_list = Item.objects.all()
-#     context = {
-#         'item_list': item_list
-#     }
+# cache the page upto this time in seconds
+# @cache_page(60 * 15)
+# @vary_on_headers("User-Agent")
+@login_required 
+def index(request):
     
-#     return render(request, 'myapp/index.html', context)
+    #fetches all items from the Item database
+    item_list = Item.objects.all()
+    
+    #initializes django's paginator class
+    paginator  = Paginator(item_list, 5)
+    
+    # capturer's the requested page number from the request
+    page_number = request.GET.get("page")
+    
+    # it takes the page number and returns only 5 item that is on that page
+    page_obj = paginator.get_page(page_number)
+    
+    # passing page_obj to template 
+    context = {
+        'page_obj': page_obj
+    }
+    return render(request, 'myapp/index.html', context)
 
-class IndexClassView(ListView):
-    model = Item
-    template_name = 'myapp/index.html'
-    context_object_name = 'item_list'
+# class IndexClassView(ListView):
+#     model = Item
+#     template_name = 'myapp/index.html'
+#     context_object_name = 'item_list'
     
 
 def item(request):

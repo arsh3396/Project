@@ -1,10 +1,14 @@
 from django.urls import path
 from . import views
+from django.views.decorators.cache import cache_page
 
 app_name='myapp'
 
 urlpatterns = [
-    path('', views.IndexClassView.as_view(), name='index'),
+    # url level caching
+    # path('', cache_page(60*15)(views.index), name='index'),
+    
+    path('', views.index, name='index'),
     path('item/', views.item),
     path('<int:pk>/', views.FoodDetail.as_view(), name='item_detail'),
     path('add/', views.ItemCreateView.as_view(), name='create_item'),
