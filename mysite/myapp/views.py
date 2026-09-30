@@ -25,21 +25,34 @@ logger = logging.getLogger(__name__)
 # @cache_page(60 * 15)
 # @vary_on_headers("User-Agent")
 
-@api_view(["GET"])
-def item_list_api(request):
-    items = Item.objects.all()
-    serializer = ItemSerializer(items, many=True)
-    return Response(serializer.data)
-
 @api_view(["GET", "POST"])
-def item_detail_api(request, pk):
+def item_list_api(request):
+    
+    # gets all the item from the database
     if request.method == "GET":
-        item = Item.objects.get(pk=pk)
+        items = Item.objects.all()
+        serializer = ItemSerializer(items, many=True)
+        return Response(serializer.data)
+    
+    # creates one item
+    elif request.method == "POST":
+        serializer = ItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+
+@api_view(["GET", "PUT"])
+def item_detail_api(request, pk):
+    item = Item.objects.get(pk=pk)
+    
+    # gets one item from the database
+    if request.method == "GET":
         serializer = ItemSerializer(item)
         return Response(serializer.data)
     
-    elif request.method == "POST":
-        serializer = ItemSerializer(data=request.data)
+    # updates the item 
+    elif request.method == "PUT":
+        serializer = ItemSerializer(item, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
