@@ -17,6 +17,7 @@ from django.http import JsonResponse
 from .serializers import ItemSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -24,6 +25,20 @@ logger = logging.getLogger(__name__)
 # cache the page upto this time in seconds
 # @cache_page(60 * 15)
 # @vary_on_headers("User-Agent")
+
+class ItemListAPIView(APIView):
+    
+    def get(self, request):
+        items = Item.objects.all()
+        serializer = ItemSerializer(items, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = ItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+    
 
 @api_view(["GET", "POST"])
 def item_list_api(request):
@@ -41,6 +56,38 @@ def item_list_api(request):
             serializer.save()
             return Response(serializer.data)
         
+
+class ItemDetailAPIView(APIView):
+    
+    def get_object(self, pk):
+        try:
+            return Item.objects.get(pk=pk)
+        except Item.DoesNotExist:
+            return None
+        
+    def get(self, request, pk):
+        item = self.get_object(pk)
+        if not item:
+            return Response("Error: Item not found")
+        serializer = ItemSerializer(item)
+        return Response(serializer.data)
+        
+    def put(self, request, pk):
+        item = self.get_object(pk)
+        if not item:
+            return Response("Error: Item not found") 
+        serializer = ItemSerializer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+    def delete(self, request, pk):
+        item = self.get_object(pk)
+        if not item:
+            return Response("Error: Item not found")
+        item.delete()
+        return Response("Message: Item is deleted")
+    
         
 
 @api_view(["GET", "PUT", "DELETE"])
@@ -64,10 +111,6 @@ def item_detail_api(request, pk):
         item.delete()
         return Response({"message: item deleted"})
 
-
-def item_list_json(request):
-    items = Item.objects.all()
-    return JsonResponse(list(items),safe=False)
 
 
 @login_required 
