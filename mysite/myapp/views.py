@@ -13,12 +13,43 @@ from django.views.decorators.vary import vary_on_headers
 import logging
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.http import JsonResponse
+from .serializers import ItemSerializer
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
 # Create your views here.
 logger = logging.getLogger(__name__)
 
 # cache the page upto this time in seconds
 # @cache_page(60 * 15)
 # @vary_on_headers("User-Agent")
+
+@api_view(["GET"])
+def item_list_api(request):
+    items = Item.objects.all()
+    serializer = ItemSerializer(items, many=True)
+    return Response(serializer.data)
+
+@api_view(["GET", "POST"])
+def item_detail_api(request, pk):
+    if request.method == "GET":
+        item = Item.objects.get(pk=pk)
+        serializer = ItemSerializer(item)
+        return Response(serializer.data)
+    
+    elif request.method == "POST":
+        serializer = ItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+
+
+def item_list_json(request):
+    items = Item.objects.all()
+    return JsonResponse(list(items),safe=False)
+
+
 @login_required 
 def index(request):
     logger.info("Fetching all items from the database")
