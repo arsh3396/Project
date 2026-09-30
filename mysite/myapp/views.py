@@ -18,6 +18,7 @@ from .serializers import ItemSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from rest_framework import generics
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -26,20 +27,27 @@ logger = logging.getLogger(__name__)
 # @cache_page(60 * 15)
 # @vary_on_headers("User-Agent")
 
-class ItemListAPIView(APIView):
-    
-    def get(self, request):
-        items = Item.objects.all()
-        serializer = ItemSerializer(items, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = ItemSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-    
+# generic views
+class ItemListCreateAPI(generics.ListCreateAPIView):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
 
+
+# class based api views
+# class ItemListAPIView(APIView):
+    
+#     def get(self, request):
+#         items = Item.objects.all()
+#         serializer = ItemSerializer(items, many=True)
+#         return Response(serializer.data)
+    
+#     def post(self, request):
+#         serializer = ItemSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+    
+# function based api 
 @api_view(["GET", "POST"])
 def item_list_api(request):
     
@@ -56,7 +64,14 @@ def item_list_api(request):
             serializer.save()
             return Response(serializer.data)
         
+        
+#generic api view
+class ItemRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
 
+
+# class based api
 class ItemDetailAPIView(APIView):
     
     def get_object(self, pk):
@@ -89,7 +104,7 @@ class ItemDetailAPIView(APIView):
         return Response("Message: Item is deleted")
     
         
-
+# function based api view
 @api_view(["GET", "PUT", "DELETE"])
 def item_detail_api(request, pk):
     item = Item.objects.get(pk=pk)
