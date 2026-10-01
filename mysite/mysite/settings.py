@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     'myapp',
     'users',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -176,4 +177,13 @@ LOGGING = {
         "handlers": ["console", "file"],
         "level": "DEBUG",
     },
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ]
 }

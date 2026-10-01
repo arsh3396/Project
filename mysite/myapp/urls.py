@@ -1,18 +1,22 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.views.decorators.cache import cache_page
-
+from rest_framework.routers import DefaultRouter
 app_name='myapp'
 
+router = DefaultRouter()
+router.register(r"items", views.ItemViewSet, basename='item')
+
 urlpatterns = [
+    path('api/', include(router.urls)),
     # url level caching
     # path('', cache_page(60*15)(views.index), name='index'),
 
     #URL pattern for API built with DRF
-    path('api/items/', views.ItemListCreateAPI.as_view(), name = "item_list_api"),
+    # path('api/items/', views.ItemListCreateAPI.as_view(), name = "item_list_api"),
     
     # URL pattern for single item
-    path('api/items/<int:pk>/', views.ItemRetrieveUpdateDestroyAPIView.as_view(), name='item_detail_api'),
+    # path('api/items/<int:pk>/', views.ItemRetrieveUpdateDestroyAPIView.as_view(), name='item_detail_api'),
     
     
     # URL Patterns of django app

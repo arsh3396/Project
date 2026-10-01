@@ -19,6 +19,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import generics
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -26,6 +28,17 @@ logger = logging.getLogger(__name__)
 # cache the page upto this time in seconds
 # @cache_page(60 * 15)
 # @vary_on_headers("User-Agent")
+
+
+# viewsets api
+class ItemViewSet(viewsets.ModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    authentication_classes = ''
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+
+
 
 # generic views
 class ItemListCreateAPI(generics.ListCreateAPIView):
